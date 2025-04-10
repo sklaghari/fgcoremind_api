@@ -25,7 +25,7 @@ urlpatterns = [
     path('api/accounts/', include('accounts.urls')),
     path('api/agents/', include('agents.urls')),
     path('api/chat/', include('chat.urls')),
-    path('api/document/', include('documents.urls')),
+    path('api/', include('documents.urls')),
 ]
 
 # Add this if DEBUG is False to serve static files during development
