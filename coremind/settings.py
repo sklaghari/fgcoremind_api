@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-0=bw&l8^ds1rd$2j7u$ym=esh9#1(=bea0f)3v!rbdj(l7el64
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['coremind-api.onrender.com','http://localhost:5173']
+ALLOWED_HOSTS = ['fgcoremind-api.onrender.com', 'http://localhost:5173']
 
 # Application definition
 
@@ -159,7 +159,6 @@ FRONTEND_URL = 'http://localhost:5173'  # Replace with your React app URL
 
 # CORS settings
 CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS').split(',')
-
 
 EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
 SENDGRID_API_KEY = config('SENDGRID_API_KEY')
