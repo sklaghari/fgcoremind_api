@@ -11,9 +11,9 @@ class MessageInline(admin.TabularInline):
 
 @admin.register(Conversation)
 class ConversationAdmin(admin.ModelAdmin):
-    list_display = ('title', 'user', 'agent', 'created_at', 'message_count')
-    list_filter = ('created_at', 'agent')
-    search_fields = ('title', 'user__username', 'user__email', 'agent__name')
+    list_display = ('title', 'user', 'created_at', 'message_count')  # Removed 'agent'
+    list_filter = ('created_at',)  # Removed 'agent'
+    search_fields = ('title', 'user__username', 'user__email')  # Removed 'agent__name'
     readonly_fields = ('created_at', 'updated_at')
     inlines = [MessageInline]
 
@@ -26,7 +26,7 @@ class ConversationAdmin(admin.ModelAdmin):
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
     list_display = ('get_conversation_title', 'role', 'short_content', 'created_at')
-    list_filter = ('role', 'created_at', 'conversation__agent')
+    list_filter = ('role', 'created_at')  # Removed 'conversation__agent'
     search_fields = ('content', 'conversation__title')
     readonly_fields = ('created_at',)
 

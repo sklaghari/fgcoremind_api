@@ -4,26 +4,22 @@ from rest_framework import status, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from agents.models import Agent
 from .models import Conversation, Message
-from .serializers import MessageSerializer, MessageInputSerializer, MessageFeedbackSerializer
+from .serializers import MessageSerializer, MessageInputSerializer
 from documents.RAGService import RAGService
 
 
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
-def send_message(request, agent_id):
-    """Send a message to the agent and get a response"""
+def send_message(request):
+    """Send a message and get a response"""
     serializer = MessageInputSerializer(data=request.data)
 
     if serializer.is_valid():
         content = serializer.validated_data['content']
         conversation_id = request.data.get('conversation_id')
 
-        # Get agent
-        agent = get_object_or_404(Agent, id=agent_id)
-
-        # Get or create conversation for this agent
+        # Get or create conversation
         if conversation_id:
             conversation = get_object_or_404(
                 Conversation,
@@ -34,8 +30,7 @@ def send_message(request, agent_id):
             # Create a new conversation if none specified
             conversation = Conversation.objects.create(
                 user=request.user,
-                agent=agent,
-                title=f"Conversation with {agent.name} on {timezone.now().strftime('%Y-%m-%d %H:%M')}"
+                title=f"Conversation on {timezone.now().strftime('%Y-%m-%d %H:%M')}"
             )
 
         # Create user message
@@ -52,8 +47,7 @@ def send_message(request, agent_id):
         # Initialize RAG service and generate response
         rag_service = RAGService()
         response_text = rag_service.generate_response(
-            query=content,
-            agent_id=agent_id
+            query=content
         )
 
         # Create assistant message
@@ -111,39 +105,15 @@ def clear_conversation_messages(request, conversation_id):
 
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
-def get_chat_history(request, agent_id):
-    """Get chat history for a specific agent (LEGACY - for backward compatibility)"""
-    # Get agent
-    agent = get_object_or_404(Agent, id=agent_id)
-
-    # Get conversation for this agent
-    conversation = Conversation.objects.filter(
-        user=request.user,
-        agent=agent
-    ).order_by('-updated_at').first()
-
-    if not conversation:
-        return Response([])
-
-    # Get messages for this conversation
-    messages = Message.objects.filter(conversation=conversation).order_by('created_at')
-    serializer = MessageSerializer(messages, many=True)
-
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])
-def get_recent_conversations(request, agent_id):
-    """Get recent conversations for a specific agent"""
+def get_recent_conversations(request):
+    """Get recent conversations for the user"""
     try:
-        # Calculate the date 30 days ago (expanded from 7 days)
+        # Calculate the date 30 days ago
         thirty_days_ago = timezone.now() - timedelta(days=30)
 
-        # Fetch conversations for the specific agent and user within the last 30 days
+        # Fetch conversations for the user within the last 30 days
         conversations = Conversation.objects.filter(
             user=request.user,
-            agent_id=agent_id,
             updated_at__gte=thirty_days_ago
         ).order_by('-updated_at')
 
@@ -173,17 +143,14 @@ def get_recent_conversations(request, agent_id):
 
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
-def create_new_conversation(request, agent_id):
-    """Create a new conversation for a specific agent"""
-    agent = get_object_or_404(Agent, id=agent_id)
-
+def create_new_conversation(request):
+    """Create a new conversation"""
     # Get title from request or generate a default
-    title = request.data.get('title', f"Conversation with {agent.name} on {timezone.now().strftime('%Y-%m-%d %H:%M')}")
+    title = request.data.get('title', f"Conversation on {timezone.now().strftime('%Y-%m-%d %H:%M')}")
 
     # Create new conversation
     conversation = Conversation.objects.create(
         user=request.user,
-        agent=agent,
         title=title
     )
 

@@ -1,4 +1,3 @@
-# pinecone_vector_store.py
 from pinecone import Pinecone, ServerlessSpec
 from django.conf import settings
 import logging
@@ -135,8 +134,8 @@ class PineconeVectorStore:
             logger.error(f"Error batch processing documents: {e}")
             raise
 
-    def search(self, query_text=None, query_embedding=None, top_k=5, user_id=None, agent_id=None, filter_dict=None):
-        """Search for similar documents using text or embedding, filtered by agent if specified"""
+    def search(self, query_text=None, query_embedding=None, top_k=5, user_id=None, filter_dict=None):
+        """Search for similar documents using text or embedding"""
         namespace = self._get_user_namespace(user_id)
 
         # Generate embedding if text is provided
@@ -145,13 +144,6 @@ class PineconeVectorStore:
 
         if not query_embedding:
             raise ValueError("Either query_text or query_embedding must be provided")
-
-        # Add agent_id to filter if specified
-        if filter_dict is None:
-            filter_dict = {}
-
-        if agent_id:
-            filter_dict["agent_id"] = str(agent_id)
 
         # First try user-specific namespace if user_id
         if user_id:
@@ -194,6 +186,7 @@ class PineconeVectorStore:
                 ))
 
         return formatted_results
+
     def delete_document(self, chunk_id, user_id=None):
         """Delete a document from the index"""
         namespace = self._get_user_namespace(user_id)

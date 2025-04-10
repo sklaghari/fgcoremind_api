@@ -1,4 +1,4 @@
-# document_processor.py (without Celery)
+# document_processor.py (without Celery and agents)
 import logging
 from django.db import transaction
 from .models import Document, DocumentChunk
@@ -25,6 +25,7 @@ def read_pdf_file(file_path):
     except Exception as e:
         logger.error(f"Error reading PDF: {e}")
         raise
+
 
 def read_docx_file(file_path):
     try:
@@ -118,7 +119,6 @@ def extract_metadata(document):
     return metadata
 
 
-# Removed @shared_task decorator
 def process_document(document_id):
     try:
         document = Document.objects.get(id=document_id)
@@ -136,10 +136,6 @@ def process_document(document_id):
 
         # Extract metadata
         metadata = extract_metadata(document)
-
-        # Add agent_id to metadata if available
-        if document.agent:
-            metadata['agent_id'] = str(document.agent.id)
 
         # Chunk the text
         chunks = chunk_text(content)

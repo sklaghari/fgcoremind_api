@@ -1,4 +1,3 @@
-# admin.py (with improved error tracking)
 from django.contrib import admin
 from django.utils.html import format_html
 from django import forms
@@ -15,7 +14,7 @@ logger = logging.getLogger(__name__)
 class DocumentAdminForm(forms.ModelForm):
     class Meta:
         model = Document
-        fields = ['title', 'file', 'user','agent']
+        fields = ['title', 'file', 'user']  # Removed 'agent' field
 
 
 class DocumentChunkInline(admin.TabularInline):
@@ -31,9 +30,9 @@ class DocumentChunkInline(admin.TabularInline):
 
 @admin.register(Document)
 class DocumentAdmin(admin.ModelAdmin):
-    list_display = ['title', 'file_type', 'user', 'agent', 'status_badge', 'total_chunks', 'created_at']
-    list_filter = ['status', 'file_type', 'created_at', 'user','agent']
-    search_fields = ['title', 'user__email','agent__name']
+    list_display = ['title', 'file_type', 'user', 'status_badge', 'total_chunks', 'created_at']  # Removed 'agent'
+    list_filter = ['status', 'file_type', 'created_at', 'user']  # Removed 'agent'
+    search_fields = ['title', 'user__email']  # Removed 'agent__name'
     readonly_fields = ['file_type', 'status', 'total_chunks', 'created_at', 'updated_at']
     form = DocumentAdminForm
     inlines = [DocumentChunkInline]

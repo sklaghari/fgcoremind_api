@@ -1,12 +1,10 @@
 from django.db import models
 from accounts.models import User
-from agents.models import Agent
 
 
 class Conversation(models.Model):
     title = models.CharField(max_length=200)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='conversations')
-    agent = models.ForeignKey(Agent, on_delete=models.CASCADE, related_name='conversations')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -33,7 +31,6 @@ class Message(models.Model):
         return f"{self.role}: {self.content[:50]}"
 
 
-# Add to models.py
 class MessageFeedback(models.Model):
     FEEDBACK_CHOICES = (
         ('helpful', 'Helpful'),
@@ -49,4 +46,3 @@ class MessageFeedback(models.Model):
 
     def __str__(self):
         return f"{self.message.conversation.title} - {self.feedback_type}"
-

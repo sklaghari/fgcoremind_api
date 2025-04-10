@@ -1,6 +1,5 @@
 from django.db import models
 from accounts.models import User
-from agents.models import Agent
 import os
 import uuid
 
@@ -24,7 +23,6 @@ class Document(models.Model):
     file = models.FileField(upload_to=document_upload_path)
     file_type = models.CharField(max_length=50)  # pdf, txt, docx, etc.
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='documents')
-    agent = models.ForeignKey(Agent, on_delete=models.CASCADE, related_name='agent_documents', null=True, blank=True)
     status = models.CharField(max_length=20, choices=PROCESSING_STATUS, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -49,4 +47,3 @@ class DocumentChunk(models.Model):
 
     def __str__(self):
         return f"{self.document.title} - Chunk {self.chunk_index}"
-

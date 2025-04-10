@@ -18,15 +18,14 @@ class RAGService:
         self.top_k = 5  # Number of chunks to retrieve
         self.similarity_threshold = 0.7
 
-    def retrieve_relevant_chunks(self, query: str, agent_id=None) -> List[Dict[str, Any]]:
+    def retrieve_relevant_chunks(self, query: str) -> List[Dict[str, Any]]:
         """Retrieve relevant chunks from the vector store."""
         try:
             # Generate query embedding
             query_embedding = self.vector_store.generate_embedding(query)
             results = self.vector_store.search(
                 query_embedding=query_embedding,
-                top_k=self.top_k,
-                agent_id=agent_id  # Pass agent_id to filter documents
+                top_k=self.top_k
             )
 
             filtered_results = [
@@ -63,11 +62,11 @@ class RAGService:
 
         return context
 
-    def generate_response(self, query: str, agent_id=None) -> str:
+    def generate_response(self, query: str) -> str:
         """Generate a response using RAG when context is available, else use open-ended generation."""
         try:
             # Step 1: Retrieve relevant document chunks
-            chunks = self.retrieve_relevant_chunks(query, agent_id=agent_id)
+            chunks = self.retrieve_relevant_chunks(query)
 
             # Step 2: Format chunks into context
             context = self.format_context(chunks)
