@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-0=bw&l8^ds1rd$2j7u$ym=esh9#1(=bea0f)3v!rbdj(l7el64'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['fgcoremind-api.onrender.com', 'http://localhost:5173']
 
